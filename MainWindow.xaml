@@ -1,0 +1,145 @@
+﻿<Window x:Class="C_2.MainWindow"
+        x:Name="AppWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local ="clr-namespace:C_2" xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        d:DataContext="{d:DesignInstance Type=local:ViewModel}"
+    mc:Ignorable="d"
+        Title="Shannon-Fano Encoder/Decoder" Height="400" Width="400">
+    <Window.Resources>
+        <Style x:Key="ButtonStyle">
+            <Setter Property="Control.Margin" Value="10"/>
+            <Setter Property="Control.FontSize" Value="20"/>
+            <Setter Property="Control.HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Control.VerticalAlignment" Value="Center"/>
+        </Style>
+        <CollectionViewSource x:Key='Words' Source="{Binding Words}" IsLiveSortingRequested="True">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Item3" Direction="Descending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </Window.Resources>
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" Height="Auto">
+                <MenuItem Header="Файл">
+                    <Separator/>
+                    <MenuItem Height="Auto" Header="Выход" CommandParameter="{Binding ElementName=AppWindow}" Command="{Binding ExitCommand}"/>
+                </MenuItem>
+            </Menu>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="0.5*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.6*"/>
+                        <RowDefinition Height="0.4*"/>
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <GroupBox>
+                                <GroupBox.Header>
+                                    <Grid Grid.Column="0" Grid.Row="0" DockPanel.Dock="Top" VerticalAlignment="Top" 
+                                  Width="{Binding RelativeSource={RelativeSource Self}, Path=Parent.ActualWidth}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0.4*"/>
+                                            <ColumnDefinition Width="0.6*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Bottom" TextWrapping="Wrap" Grid.Column="0" Text="Символ алфавита"/>
+                                        <TextBlock VerticalAlignment="Bottom" TextWrapping="Wrap" Grid.Column="1" Text="Кодовое слово"/>
+                                    </Grid>
+                                </GroupBox.Header>
+                                <ListView HorizontalContentAlignment="Stretch" ItemsSource="{Binding Source={StaticResource Words}}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="0.4*"/>
+                                                    <ColumnDefinition Width="0.6*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Path=Item1}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Path=Item3}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListView>
+                            </GroupBox>
+                        </ScrollViewer>
+                    </DockPanel>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Margin="2" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" VerticalAlignment="Bottom">Средняя длина кодового слова:</TextBlock>
+                        <TextBlock Margin="2" Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Bottom">Избыточность:</TextBlock>
+                        <TextBlock Margin="2" Grid.Column="0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Bottom">Неравенство Крафта:</TextBlock>
+                        <TextBlock Margin="2" Grid.Column="1" Grid.Row="0" TextWrapping="Wrap" Text="{Binding Path=AverageCodeLength}"/>
+                        <TextBlock Margin="2" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Path=Redundancy}"/>
+                        <TextBlock Margin="2" Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Path=IsKraft}"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.6*"/>
+                        <RowDefinition Height="0.4*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox>
+                        <GroupBox.Header>Пути к файлам</GroupBox.Header>
+                        <StackPanel Grid.Row="0" Margin="10">
+                            <TextBlock>Вероятности:</TextBlock>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="6*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding ProbabilitiesFilePath, Mode=TwoWay}"></TextBox>
+                                <Button Grid.Column="1" CommandParameter="{Binding ElementName=AppWindow}" Command="{Binding PickProbabilityPathCommand}">Файл...</Button>
+                            </Grid>
+                            <TextBlock>Алфавит источника:</TextBlock>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="6*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding AlphabetFilePath, Mode=TwoWay}"></TextBox>
+                                <Button Grid.Column="1" Command="{Binding PickAlphabetPathCommand}">Файл...</Button>
+                            </Grid>
+                            <TextBlock>Последовательность:</TextBlock>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="6*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding TextFilePath, Mode=TwoWay}"></TextBox>
+                                <Button Grid.Column="1" Command="{Binding PickTextPathCommand}">Файл...</Button>
+                            </Grid>
+                            <TextBlock>Результат:</TextBlock>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="6*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding ResultFilePath, Mode=TwoWay}"></TextBox>
+                                <Button Grid.Column="1" Command="{Binding PickResultPathCommand}">Файл...</Button>
+                            </Grid>
+                        </StackPanel>
+                    </GroupBox>
+                    <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                        <Button Style="{StaticResource ButtonStyle}" Command="{Binding EncodeCommand}">Закодировать</Button>
+                        <Button Style="{StaticResource ButtonStyle}" Command="{Binding DecodeCommand}">Декодировать</Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>
